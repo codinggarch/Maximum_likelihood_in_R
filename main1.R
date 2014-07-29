@@ -1,3 +1,5 @@
+#http://www.fescue.colostate.edu/current/Summer%20Events/Summer%202009/literature/MLE%20Stu.pdf
+
 kvec = 1:100
 probk = dbinom(kvec, size=100, prob=0.90)
 
@@ -13,9 +15,15 @@ abline(v=pvec[which.max(Lk)], col=4, lty=2)
 #abline(v=CI95[2], col=2, lty=2)
 
 par(mfrow=c(1,2))
-LogLk = dbinom(30, size=100, prob=pvec, log=T)
+LogLk = dbinom(20, size=100, prob=pvec, log=T)
 plot(pvec, LogLk, xlab="p", ylab="Log-Likelihood")
 abline(v=pvec[which.max(LogLk)], col=4, lty=2)
 nLogLk = -dbinom(20, size=100, prob=pvec, log=T)
 plot(pvec, nLogLk, xlab="p", ylab="-Log-Likelihood")
 abline(v=pvec[which.min(nLogLk)], col=4, lty=2)
+
+
+library(bbmle)
+source("nLogLik.r")
+mlefit <- mle2(nLogLik, start= list(p= 0.5), data= list(N= 100, k= 20))
+mlefit

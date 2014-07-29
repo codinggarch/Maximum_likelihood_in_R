@@ -1,0 +1,526 @@
+incster
+?qt()
+help qt
+help qt()
+incster <- tapply(incomes, statef, qt)
+df=1
+df=0
+incster <- tapply(incomes, statef, qt)
+defaults write org.R-project.R force.LANG en_US.UTF-8
+Sys.getenv("LC_CTYPE")
+sessionInfo()
+defaults write org.R-project.R force.LANG en_US.UTF-8
+system("defaults write org.R-project.R force.LANG en_US.UTF-8")
+library(ggplot2)
+help(package=ggplot2)
+qplot(mpg, wt, data=mtcars)
+---------------------------------------------------------------#
+# Betty's experiment#
+# Introduction to R and fitting psychophysical functions#
+##
+# by Sven Ohl#
+# 01.07.2013#
+#---------------------------------------------------------------#
+#---------------------------------------------------------------#
+# Remove everything from the workspace#
+rm(list=ls())#
+curpath <- getwd()#
+outpath <- "/Users/svenohl/Desktop"#
+#---------------------------------------------------------------#
+#---------------------------------------------------------------#
+# Load interesting packages#
+library(ggplot2)#
+library(psyphy)#
+#---------------------------------------------------------------#
+#---------------------------------------------------------------#
+# Define some colours#
+deforange <- rgb(255,150,0,max=255)#
+defblue   <- rgb(0,150,255,max=255)#
+#---------------------------------------------------------------#
+#---------------------------------------------------------------#
+# Load data file and name columns#
+#data <- read.table("TuPtfm02.dat")#
+#data <- read.table("TuPtzk01.dat")#
+#data <- read.table("TuPtam01.dat")#
+data <- read.table("TuPtds01.dat")#
+colnames(data) <- c("V1","V2","V3","fixpox","fixpoy","stipos","stipox","stipoy","cueDir","stiDir","the","kap","stipre",#
+"tFix","tCue","tOns","tOff","tEnd","tRes","tPos","tClr",#
+"keyRT","chosenRes","respCorrect")#
+#---------------------------------------------------------------#
+#---------------------------------------------------------------#
+# Check and prepare variables#
+str(data)#
+head(data)#
+table(data)#
+data$cuetype 		<- ifelse(data$cueDir=="NaN","neutral","cued")#
+data$cuetype 		<- as.factor(data$cuetype)#
+data$cuetype_int 	<- ifelse(data$cueDir=="NaN",1,2)#
+#---------------------------------------------------------------#
+#---------------------------------------------------------------#
+# Signaldetection variables ... d' = Z(HIT-Rate) - Z(FA-Rate)#
+data$HIT  <- ifelse(data$chosenRes == 2 & data$respCorrect == 1,1,0)#
+data$FA   <- ifelse(data$chosenRes == 2 & data$respCorrect == 0,1,0)#
+data$MISS <- ifelse(data$chosenRes == 1 & data$respCorrect == 0,1,0)#
+data$CR   <- ifelse(data$chosenRes == 1 & data$respCorrect == 1,1,0)#
+#---------------------------------------------------------------#
+#---------------------------------------------------------------#
+# Try for kappa = 10000 in cued condition#
+dp <- data.frame(kap=rep(0,times=12),cond=rep(0,times=12),hit_rate=rep(0,times=12),fa_rate=rep(0,times=12),dprime=rep(0,times=12),dprimeKK=rep(0,times=12))#
+count <- 0#
+for (i in 1:6){#
+	for (j in 1:2){#
+		count <- count + 1#
+		d <- data[which(data$V1==i & data$cuetype_int == j),]#
+		hit_rate <- sum(d$HIT)/(sum(d$HIT)+sum(d$MISS))#
+		fa_rate  <- sum(d$FA)/(sum(d$FA)+sum(d$CR))#
+		dprime   <- qnorm(hit_rate, mean = 0, sd = 1) - qnorm(fa_rate, mean = 0, sd = 1)#
+		dp$kap[count] <- max(d$kap) #
+		dp$cond[count] <- j #
+		dp$hit_rate[count] <- hit_rate#
+		dp$fa_rate[count]  <- fa_rate#
+		dp$dprime[count] <- dprime #
+		dp$dprimeKK[count] <- dprime.SD(zdiff=qnorm(hit_rate)-qnorm(fa_rate),method="IO")#
+	}	#
+	}#
+dp$cond <- as.factor(dp$cond)#
+levels(dp$cond) <- c("neutral","cued")#
+#---------------------------------------------------------------#
+#---------------------------------------------------------------#
+# get some idea of the plot#
+fig <- ggplot(dp,aes(x=kap,y=dprime,shape=cond)) +geom_point(size=3) + geom_line()#
+fig <- fig + scale_x_log10() + ylim(-1,3.5) + theme_bw(base_size = 20)#
+fig <- fig + scale_colour_manual(values=c(deforange,defblue))#
+fig <- fig + theme(legend.position = c(0.8,0.85))#
+fig <- fig + theme(legend.title = element_blank())#
+fig <- fig + xlab("Kappa") + ylab("d'")#
+#---------------------------------------------------------------#
+#---------------------------------------------------------------#
+# Save file#
+pdf("dprime_values.pdf",width=6,height=6)#
+fig#
+dev.off()#
+#---------------------------------------------------------------
+install.packages('CircStats')
+library(CircStats)circ.summary(thetaDeg)circ.plot(thetaDeg, cex=0.3, pch=20, stack=T, bins=50, shrink=2)
+library(CircStats)
+hip = read.table("http://astrostatistics.psu.edu/MSMA/datasets/HIP.dat",header=T,fill=T)dim(hip)names(hip)hip = na.omit(hip)
+summary(hip)hist(hip[,8], breaks=50)
+hip = hip[hip[,'e_Plx']<5,]pmRA = with(hip, pmRA - median(pmRA))pmDE = with(hip, pmDE - median(pmDE))
+plot(pmRA, pmDE, pch=20, cex=0.6,xlab='Proper motion R.A. (mas/yr)',ylab='Proper motion Dec. (mas/yr)',main='')abline(h=0,v=0, lty=2, lwd=2)
+nstar = length(pmRA)rad2deg = 360 / (2*pi)thetaRad = atan2(pmDE, pmRA)thetaDeg = thetaRad * rad2deg
+hist(thetaDeg, breaks=30, lwd=2,xlab='Position angle theta (degrees)',main='')
+install.packages('CircStats')library(CircStats)circ.summary(thetaDeg)circ.plot(thetaDeg, cex=0.3, pch=20, stack=T, bins=50, shrink=2)
+install.packages('circular')library(circular)
+theta = circular(thetaRad)theta_kde = density(theta, bw=100, type='K') #1/100 is the#smoothing paramplot(theta_kde, main='', xlab='', ylab='', lwd=2)
+circ.summary(theta)circ.disp(theta)[4]
+r.test(theta)
+watson(thetaRad)
+kuiper(thetaRad)
+angles = runif(100,0,2*pi)circ.plot(angles * rad2deg, pch=20, stack=T, bins=50, shrink=2)
+sorted.angles = sort(angles)arcLen = diff(sorted.angles)arcLen = c(arcLen, 2*pi-range(angles))hist(arcLen,breaks=50)
+rao.spacing(thetaRad)
+par(mfrow=c(2,3))
+angles = rvm(100, 0, 1)
+angles
+?rvm
+circ.plot(angles, pch=20, stack=T, bins=50)
+angles = rvm(100, 0, 2)circ.plot(angles, pch=20, stack=T, bins=50)angles = rvm(100, 0, 4)circ.plot(angles, pch=20, stack=T, bins=50)angles = rvm(100, pi/2, 1)circ.plot(angles, pch=20, stack=T, bins=50)angles = rvm(100, pi/2, 2)circ.plot(angles, pch=20, stack=T, bins=50)angles = rvm(100, pi/2, 4)circ.plot(angles, pch=20, stack=T, bins=50)par(mfrow=c(1,1))
+angles = rvm(100, 0, 1)
+circ.plot(angles)
+circ.plot(angles, pch=20, stack=T, bins=50)
+circ.plot(angles)
+circ.plot(angles, pch=20, stack=T, bins=50)
+circ.plot(angles)
+angles = rvm(10, 0, 1)
+angles
+circ.plot(angles)
+angles = rvm(10, 0, 2)
+angles
+circ.plot(angles)
+angles= 6
+circ.plot(angles)
+angles = rvm(10, 0, 10)
+circ.plot(angles)
+angles = rvm(100, 0, 8)
+circ.plot(angles)
+angles = rvm(100, 0, 4)
+circ.plot(angles)
+angles = rvm(1000, 0, 4)
+circ.plot(angles)
+angles = rvm(10000, 0, 4)
+circ.plot(angles)
+angles = rvm(10000, 0, 8)
+circ.plot(angles)
+circ.plot(angles, pch=20, stack=T, bins=50)
+circ.plot(angles)
+circ.plot(angles)#
+11
+circ.plot(angles)#
+11#
+#
+w
+circ.plot(angles)#
+11#
+#
+w#
+quit
+circ.plot(angles)#
+11#
+#
+w#
+quit#
+exit()
+circ.plot(angles)#
+11#
+#
+w#
+quit#
+exit()#
+quit()
+circ.plot(angles)
+circ.plot(angles)#
+quit("yes")
+angles = rvm(10000, 0, 8)
+angles = rvm(10000, 0, 4)
+install.packages('CircStats')
+angles = rvm(10000, 0, 4)
+install.packages('circular')
+angles = rvm(10000, 0, 4)
+install.packages('circular')
+angles = rvm(10000, 0, 4)
+install.packages('CircStats')
+angles = rvm(10000, 0, 4)
+install.packages('circular')
+angles = rvm(10000, 0, 4)
+library(CircStats)
+library(circular)
+angles = rvm(10000, 0, 4)
+log(3)
+log(10)
+log(3.14)
+ln(1)
+ln(1000)
+log(100)
+log(1000)
+log10(1000)
+ls()
+ls
+ls()
+library(ggplot2)#
+library(psyphy)#
+library(reshape)#
+library(CircStats)#
+library(circular)
+library(MPDiR)
+names(HSP) <- c("Quanta","PerCent","N","Obs","Run")
+HSP$NumYes <- round(HSP$N*HSP$PerCent/100)
+HSP$NumNo <- HSP$N-HSP$NumYes
+?subset
+SHR1 <- subset(HSP,Obs=="SH" & Run=="R1")
+SHR1
+(SHR1 <- subset(HSP,Obs=="SH" & Run=="R1"))
+SHR1.glm <- glm(formula=cbind(NumYes,NumNo) ~ log(Quanta),family =binomial(probit),data=SHR1)
+?cbind
+?glm
+SHR1.glm
+plot(PerCent/100 ~ Quanta, SHR1,+ xlab = "Quanta/Flash", ylab = "Proportion ¨seen¨",+ main = "Obs: SH, Run: 1", log = "x",+ xlim = c(20, 440)) # set up plot
+plot(PerCent/100 ~ Quanta, SHR1,xlab = "Quanta/Flash", ylab = "Proportion ¨seen¨",main = "Obs: SH, Run: 1", log = "x", xlim = c(20, 440)) # set up plot
+xseq <- seq(20, 450, len = 100)
+SHR1.pred <- predict(SHR1.glm, newdata =data.frame(Quanta = xseq), type = "response",se.fit = TRUE) # obtain predicted values
+polygon(c(xseq, rev(xseq)), c(SHR1.pred$fit SHR1.pred$se.fit, rev(SHR1.pred$fit - SHR1.pred$se.fit)), border = "white", col = "grey") # plot SE envelope
+polygon(c(xseq, rev(xseq)), c(SHR1.pred$fit +SHR1.pred$se.fit, rev(SHR1.pred$fit - SHR1.pred$se.fit)), border = "white", col = "grey") # plot SE envelope
+lines(xseq, SHR1.pred$fit, lwd = 2)# add fitted curve
+SHR1
+SHR1.pred
+SHR1.pred$fit
+SHR1.pred$sefit
+SHR1.pred$se.fit
+#plot Von Mises#
+#
+for (i in 1:length(sum_of_all_data$vita)){#
+#
+	x = seq(-pi,pi, by=0.001)#
+	vita= sum_of_all_data$vita[i]#
+	gamma_mi=sum_of_all_data$gamma_mi[i]#
+	kappa_one = sum_of_all_data$kappa_one[i] #
+	mi_one= 0#
+	alfa = sum_of_all_data$alfa[i] #
+	kappa_two = sum_of_all_data$kappa_two[i] #
+	mi_two=pi#
+	#von_mises=vita + gamma_mi*(alfa*(exp(kappa_one*cos(x))+(1-alfa)*(exp(kappa_two*cos((x))))))#
+	von_mises=vita + gamma_mi*(alfa*(exp(kappa_one*cos(x))))+gamma_mi*(1-alfa)*(exp(kappa_two*cos((x+pi))))#
+	#convert x to from rads to degrees#
+	x <- x*57.29#
+#
+if(i==1){#
+	Von_mises <- Von_mises+plot(x,von_mises, main = time[i],ylim=c(0,3),axes=FALSE,bty="n")#
+}#
+#
+if(i>1){#
+	Von_mises <- Von_mises+points(x,von_mises, main = time[i],bty="n")#
+}#
+}#
+for(i in 1:length(mean_gamma_mi$time)){#
+	x = seq(-pi,pi, by=0.001)#
+	vita=mean_vita$vita[i]#
+	gamma_mi=mean_gamma_mi$gamma_mi[i]#
+	kappa_one = mean_kappa_one$kappa_one[i]#
+	mi_one= 0#
+	alfa=mean_alfa$alfa[i]#
+	kappa_two = mean_kappa_two$kappa_two[i]#
+	mi_two=pi#
+	#von_mises=vita + gamma_mi*(alfa*(exp(kappa_one*cos(x))+(1-alfa)*(exp(kappa_two*cos((x))))))#
+	von_mises=vita + gamma_mi*(alfa*(exp(kappa_one*cos(x))))+gamma_mi*(1-alfa)*(exp(kappa_two*cos((x+pi))))#
+	#convert x to from rads to degrees#
+	x <- x*57.29#
+#
+Von_mises <- Von_mises+points(x,von_mises,col="red", main = time[i],bty="n") }#
+Von_mises <- Von_mises + axis(side=1, at=c(-90,0,90))	#
+Von_mises <- Von_mises + axis(side=2, at=c(0,1,2,3))
+## Avoid printing to unwarranted accuracy#
+od <- options(digits = 5)#
+x <- 0:10#
+y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)#
+#
+## Easy one-dimensional MLE:#
+nLL <- function(lambda) -sum(stats::dpois(y, lambda, log = TRUE))#
+fit0 <- mle(nLL, start = list(lambda = 5), nobs = NROW(y))#
+# For 1D, this is preferable:#
+fit1 <- mle(nLL, start = list(lambda = 5), nobs = NROW(y),#
+            method = "Brent", lower = 1, upper = 20)#
+stopifnot(nobs(fit0) == length(y))#
+#
+## This needs a constrained parameter space: most methods will accept NA#
+ll <- function(ymax = 15, xhalf = 6) {#
+    if(ymax > 0 && xhalf > 0)#
+      -sum(stats::dpois(y, lambda = ymax/(1+x/xhalf), log = TRUE))#
+    else NA#
+}#
+(fit <- mle(ll, nobs = length(y)))#
+mle(ll, fixed = list(xhalf = 6))#
+## alternative using bounds on optimization#
+ll2 <- function(ymax = 15, xhalf = 6)#
+    -sum(stats::dpois(y, lambda = ymax/(1+x/xhalf), log = TRUE))#
+mle(ll2, method = "L-BFGS-B", lower = rep(0, 2))#
+#
+AIC(fit)#
+BIC(fit)#
+#
+summary(fit)#
+logLik(fit)#
+vcov(fit)#
+plot(profile(fit), absVal = FALSE)#
+confint(fit)#
+#
+## Use bounded optimization#
+## The lower bounds are really > 0,#
+## but we use >=0 to stress-test profiling#
+(fit2 <- mle(ll, method = "L-BFGS-B", lower = c(0, 0)))#
+plot(profile(fit2), absVal = FALSE)#
+#
+## a better parametrization:#
+ll3 <- function(lymax = log(15), lxhalf = log(6))#
+    -sum(stats::dpois(y, lambda = exp(lymax)/(1+x/exp(lxhalf)), log = TRUE))#
+(fit3 <- mle(ll3))#
+plot(profile(fit3), absVal = FALSE)#
+exp(confint(fit3))#
+#
+options(od)
+## Avoid printing to unwarranted accuracy#
+od <- options(digits = 5)#
+x <- 0:10#
+y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)#
+#
+## Easy one-dimensional MLE:#
+nLL <- function(lambda) -sum(stats::dpois(y, lambda, log = TRUE))#
+fit0 <- mle(nLL, start = list(lambda = 5), nobs = NROW(y))
+library("mle")
+library(mle)
+## Avoid printing to unwarranted accuracy#
+od <- options(digits = 5)#
+x <- 0:10#
+y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)#
+#
+## Easy one-dimensional MLE:#
+nLL <- function(lambda) -sum(stats::dpois(y, lambda, log = TRUE))#
+fit0 <- mle(nLL, start = list(lambda = 5), nobs = NROW(y))
+fit0 <- mle2(nLL, start = list(lambda = 5), nobs = NROW(y))
+set.seed(1001)
+N<-100
+x<-rnorm(N, mean=3,sd=2)
+mean(x)
+sd(x)
+LL <-function(mu, sigma){R=dnorm(x,mu,sigma)-sum(log(R))}
+library(stats4)
+mle(LL,start =list(mu=1,sigma=1))
+LL <-function(mu, sigma){R=dnorm(x,mu,sigma)-sum(log(R))}
+LL <-function(mu, sigma){R=dnorm(x,mu,sigma)-sum(log(R))}
+LL <-function(mu, sigma){}
+LL <-function(mu, sigma){R=dnorm(x,mu,sigma)-sum(log(R))}
+mle(LL,start =list(mu=1,sigma=1))
+mle(LL,start =list(mu=1,sigma=1))
+LL <-function(mu, sigma){R=dnorm(x,mu,sigma)#-sum(log(R))}
+q
+e
+qq
+mle(LL,start =list(mu=1,sigma=1))
+p.parameter <- 0.8#
+sequence <- rbinom(10, 1, p.parameter)
+sequence
+likelihood <- function(sequence, p.parameter)#
+{#
+  likelihood <- 1#
+  for (i in 1:length(sequence))#
+  {#
+    if (sequence[i] == 1)#
+    {#
+      likelihood <- likelihood * p.parameter#
+    }#
+    else#
+    {#
+      likelihood <- likelihood * (1 - p.parameter)#
+    }#
+  }#
+  return(likelihood)#
+}
+possible.p <- seq(0, 1, by = 0.001)#
+jpeg('Likelihood_Concavity.jpg')#
+library('ggplot2')#
+qplot(possible.p,#
+      sapply(possible.p, function (p) {likelihood(sequence, p)}),#
+      geom = 'line',#
+      main = 'Likelihood as a Function of P',#
+      xlab = 'P',#
+      ylab = 'Likelihood')#
+dev.off()
+pwd
+getwd()
+ls
+ls()
+setwd("Desktop/")
+mkdir
+getwd()
+cd Maxisetwd("Maximum_Likelihood/")
+setwd("Maximum_Likelihood/")
+possible.p <- seq(0, 1, by = 0.001)#
+jpeg('Likelihood_Concavity.jpg')#
+library('ggplot2')#
+qplot(possible.p,#
+      sapply(possible.p, function (p) {likelihood(sequence, p)}),#
+      geom = 'line',#
+      main = 'Likelihood as a Function of P',#
+      xlab = 'P',#
+      ylab = 'Likelihood')#
+dev.off()
+dev.off()
+dev.off()
+possible.p <- seq(0, 1, by = 0.001)#
+jpeg('Likelihood_Concavity.jpg')#
+library('ggplot2')#
+qplot(possible.p,#
+      sapply(possible.p, function (p) {likelihood(sequence, p)}),#
+      geom = 'line',#
+      main = 'Likelihood as a Function of P',#
+      xlab = 'P',#
+      ylab = 'Likelihood')#
+dev.off()
+possible.p <- seq(0, 1, by = 0.001)#
+jpeg('Likelihood_Concavity.jpg')#
+library('ggplot2')
+qplot(possible.p,#
+      sapply(possible.p, function (p) {likelihood(sequence, p)}),#
+      geom = 'line',#
+      main = 'Likelihood as a Function of P',#
+      xlab = 'P',#
+      ylab = 'Likelihood')
+dev.off()
+source("main")
+source("main.R")
+source("main.R")
+ls()
+source("likelihood.R")#
+#
+possible.p <- seq(0, 1, by = 0.001)#
+jpeg('Likelihood_Concavity.jpg')#
+library('ggplot2')#
+qplot(possible.p,#
+      sapply(possible.p, function (p) {likelihood(sequence, p)}),#
+      geom = 'line',#
+      main = 'Likelihood as a Function of P',#
+      xlab = 'P',#
+      ylab = 'Likelihood')#
+dev.off()
+source("main.R")
+source("main.R")
+source("main.R")
+source("main.R")
+source("main.R")
+source("main.R")
+source("main.R")
+source("main.R")
+mle.results
+source("main.R")
+source("main.R")
+source("main.R")
+dbinom(20, size=100, prob=0)
+s<-dbinom(20, size=100, prob=0.5)
+plot(s)
+dbinom(20, size=100, prob=0.5)
+kvec = 1:100
+probk = dbinom(kvec, size=100, prob=0.20)
+plot(kvec, probk, xlab="No. Infections, k", ylab="P(k|p,N)",#
++ type="h", sub="(p = 0.2, N = 100)", main="", col="navy")
+plot(kvec, probk, xlab="No. Infections, k", ylab="P(k|p,N)", type="h", sub="(p = 0.2, N = 100)", main="", col="navy")
+plot(kvec, probk, xlab="No. Infections, k", ylab="P(k|p,N)", type="h", sub="(p = 0.2, N = 100)", main="", col="navy")
+plot(kvec, probk, xlab="No. Infections, k", ylab="P(k|p,N)", type="h", sub="(p = 0.2, N = 100)", main="", col="navy")
+dev.off()
+dev.off()
+dev.off()
+dev.off()
+plot(kvec, probk, xlab="No. Infections, k", ylab="P(k|p,N)", type="h", sub="(p = 0.2, N = 100)", main="", col="navy")
+source("main1.R")
+source("main1.R")
+source("main1.R")
+source("main1.R")
+source("main1.R")
+source("main1.R")
+source("main1.R")
+source("main1.R")
+source("main1.R")
+source("main1.R")
+sum(probk)
+source("main1.R")
+source("main1.R")
+source("main1.R")
+pvec = seq(0, 1, 0.01)#
+Lk = dbinom(20, size=100, prob=pvec)#
+plot(pvec, Lk, "l", xlab="Infection probability, p", ylab="Likelihood, L(p)",sub="(k = 20, N = 100)", main="Likelihood Function", lwd=2)
+source("main1.R")
+require(bbmle)
+mlefit <- mle2(nLogLik, start= list(p= 0.5), data= list(N= 100, k= 20))
+require(bbmle)
+library(bbmle)
+library(bbmle)
+library(bbmle)
+require(bbmle)
+mlefit <- mle2(nLogLik, start= list(p= 0.5), data= list(N= 100, k= 20))
+source("main1.R")
+source("main1.R")
+source("main1.R")
+source("main1.R")
+source("main1.R")
+confint(mlefit)
+(mlefit)
+exp(logLik(mlefit))
+k.pred <- rbinom(n=30, size=20, prob=0.375)
+k.pred
+k.pred <- rbinom(n=30, size=20, prob=0.5)
+k.pred
+source("main2.R")
+source("main2.R")
+source("main2.R")
+RickerFit <- mle2(RickLogL, start= list(a=2, b=1), data=list(x=x, y=y))
+source("main2.R")
+source("main2.R")
+source("main2.R")
+source("main2.R")
